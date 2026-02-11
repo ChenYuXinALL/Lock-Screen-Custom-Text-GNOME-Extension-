@@ -8,31 +8,33 @@ export default class LockScreenCustomTextPrefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
         const page = new Adw.PreferencesPage();
-        const group = new Adw.PreferencesGroup({ title: _('Text Settings') });
-        page.add(group);
 
-        // Text Content
+        // 1. 内容与外观组
+        const contentGroup = new Adw.PreferencesGroup({ title: _('Content & Appearance') });
+        page.add(contentGroup);
+
+        // 文本内容
         const textRow = new Adw.EntryRow({
-            title: _('Text Content'),
-            text: settings.get_string('text-content')
+            title: _('Custom Text'),
+            text: settings.get_string('custom-text')
         });
         textRow.connect('changed', (entry) => {
-            settings.set_string('text-content', entry.text);
+            settings.set_string('custom-text', entry.text);
         });
-        group.add(textRow);
+        contentGroup.add(textRow);
 
-        // Font Size
+        // 字体大小
         const sizeRow = new Adw.SpinRow({
             title: _('Font Size (px)'),
-            adjustment: new Gtk.Adjustment({ lower: 10, upper: 200, step_increment: 1 }),
+            adjustment: new Gtk.Adjustment({ lower: 8, upper: 200, step_increment: 1 }),
             value: settings.get_int('font-size')
         });
         sizeRow.connect('notify::value', (spin) => {
             settings.set_int('font-size', spin.value);
         });
-        group.add(sizeRow);
+        contentGroup.add(sizeRow);
 
-        // Font Color
+        // 字体颜色
         const colorRow = new Adw.ActionRow({ title: _('Font Color') });
         const colorBtn = new Gtk.ColorDialogButton({
             dialog: new Gtk.ColorDialog(),
@@ -43,31 +45,31 @@ export default class LockScreenCustomTextPrefs extends ExtensionPreferences {
             settings.set_string('font-color', btn.rgba.to_string());
         });
         colorRow.add_suffix(colorBtn);
-        group.add(colorRow);
+        contentGroup.add(colorRow);
 
-        // Behavior Group
+        // 2. 行为与位置组
         const behaviorGroup = new Adw.PreferencesGroup({ title: _('Behavior & Position') });
         page.add(behaviorGroup);
 
-        // Animation Mode
-        const modeRow = new Adw.ComboRow({
-            title: _('Animation Mode'),
-            model: new Gtk.StringList({ strings: ['animate', 'fixed'] }),
-            selected: settings.get_string('animation-mode') === 'fixed' ? 1 : 0
+        // 固定模式开关
+        const fixedRow = new Adw.SwitchRow({
+            title: _('Fixed Position Mode'),
+            subtitle: _('If enabled, text stays in place. If disabled, it moves with the clock animation.'),
+            active: settings.get_boolean('fixed-mode')
         });
-        modeRow.connect('notify::selected', (combo) => {
-            settings.set_string('animation-mode', combo.selected === 1 ? 'fixed' : 'animate');
+        fixedRow.connect('notify::active', (sw) => {
+            settings.set_boolean('fixed-mode', sw.active);
         });
-        behaviorGroup.add(modeRow);
+        behaviorGroup.add(fixedRow);
 
-        // Position Preset
-        const presets = ['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'];
+        // 位置预设 (GUI Selection)
+        const presets = ['top-left', 'top-center', 'top-right', 'center', 'bottom-left', 'bottom-center', 'bottom-right'];
         const presetRow = new Adw.ComboRow({
             title: _('Position Preset'),
             model: new Gtk.StringList({ strings: presets }),
         });
         
-        // Find current index
+        // 查找当前索引
         let currentPreset = settings.get_string('position-preset');
         let index = presets.indexOf(currentPreset);
         if (index === -1) index = 1; // default top-center
@@ -78,28 +80,26 @@ export default class LockScreenCustomTextPrefs extends ExtensionPreferences {
         });
         behaviorGroup.add(presetRow);
 
-        // Offsets
-        const xOffsetRow = new Adw.SpinRow({
+        // 偏移调节
+        const xRow = new Adw.SpinRow({
             title: _('Offset X (px)'),
+            subtitle: _('Fine-tune horizontal position'),
             adjustment: new Gtk.Adjustment({ lower: -1000, upper: 1000, step_increment: 1 }),
-            value: settings.get_int('offset-x')
+            value: settings.get_int('pos-x')
         });
-        xOffsetRow.connect('notify::value', (spin) => {
-            settings.set_int('offset-x', spin.value);
-        });
-        behaviorGroup.add(xOffsetRow);
+        xRow.connect('notify::value', (spin) => settings.set_int('pos-x', spin.value));
+        behaviorGroup.add(xRow);
 
-        const yOffsetRow = new Adw.SpinRow({
+        const yRow = new Adw.SpinRow({
             title: _('Offset Y (px)'),
+            subtitle: _('Fine-tune vertical position'),
             adjustment: new Gtk.Adjustment({ lower: -1000, upper: 1000, step_increment: 1 }),
-            value: settings.get_int('offset-y')
+            value: settings.get_int('pos-y')
         });
-        yOffsetRow.connect('notify::value', (spin) => {
-            settings.set_int('offset-y', spin.value);
-        });
-        behaviorGroup.add(yOffsetRow);
+        yRow.connect('notify::value', (spin) => settings.set_int('pos-y', spin.value));
+        behaviorGroup.add(yRow);
 
-        // Shadow Group
+        // 3. 阴影设置组
         const shadowGroup = new Adw.PreferencesGroup({ title: _('Shadow Settings') });
         page.add(shadowGroup);
 
@@ -125,7 +125,7 @@ export default class LockScreenCustomTextPrefs extends ExtensionPreferences {
         shadowGroup.add(shadowColorRow);
 
         const sxRow = new Adw.SpinRow({
-            title: _('Shadow X'),
+            title: _('Shadow Offset X'),
             adjustment: new Gtk.Adjustment({ lower: -50, upper: 50, step_increment: 1 }),
             value: settings.get_int('shadow-x')
         });
@@ -133,7 +133,7 @@ export default class LockScreenCustomTextPrefs extends ExtensionPreferences {
         shadowGroup.add(sxRow);
 
         const syRow = new Adw.SpinRow({
-            title: _('Shadow Y'),
+            title: _('Shadow Offset Y'),
             adjustment: new Gtk.Adjustment({ lower: -50, upper: 50, step_increment: 1 }),
             value: settings.get_int('shadow-y')
         });

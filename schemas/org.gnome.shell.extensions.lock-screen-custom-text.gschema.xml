@@ -2,7 +2,7 @@
 <schemalist gettext-domain="lock-screen-custom-text">
   <schema id="org.gnome.shell.extensions.lock-screen-custom-text" path="/org/gnome/shell/extensions/lock-screen-custom-text/">
     
-    <key name="text-content" type="s">
+    <key name="custom-text" type="s">
       <default>"Custom Lock Screen Text"</default>
       <summary>Text Content</summary>
     </key>
@@ -37,24 +37,24 @@
       <summary>Shadow Y Offset</summary>
     </key>
 
-    <key name="animation-mode" type="s">
-      <default>"animate"</default>
-      <summary>Animation Mode</summary>
-      <description>Options: 'animate' (moves with clock), 'fixed' (stays in place)</description>
+    <key name="fixed-mode" type="b">
+      <default>false</default>
+      <summary>Fixed Position Mode</summary>
+      <description>If true, text stays in place. If false, it moves with the clock.</description>
     </key>
 
     <key name="position-preset" type="s">
       <default>"top-center"</default>
       <summary>Position Preset</summary>
-      <description>top-left, top-center, top-right, bottom-left, bottom-center, bottom-right</description>
+      <description>top-left, top-center, top-right, center, bottom-left, bottom-center, bottom-right</description>
     </key>
 
-    <key name="offset-x" type="i">
+    <key name="pos-x" type="i">
       <default>0</default>
       <summary>Manual X Offset</summary>
     </key>
 
-    <key name="offset-y" type="i">
+    <key name="pos-y" type="i">
       <default>100</default>
       <summary>Manual Y Offset</summary>
     </key>
