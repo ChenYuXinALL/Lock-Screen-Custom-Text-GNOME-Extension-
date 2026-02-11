@@ -6,118 +6,80 @@ import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/
 export default class LockScreenCustomTextPrefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
-
         const page = new Adw.PreferencesPage();
-        const group = new Adw.PreferencesGroup({ title: _('Text Settings') });
-        const layoutGroup = new Adw.PreferencesGroup({ title: _('Layout & Appearance') });
 
-        // Custom Text Input
+        // 文字内容组
+        const group = new Adw.PreferencesGroup({ title: _('Text Content') });
         const textRow = new Adw.EntryRow({
-            title: _('Custom Text'),
+            title: _('Text'),
             text: settings.get_string('custom-text')
         });
-        textRow.connect('changed', (entry) => {
-            settings.set_string('custom-text', entry.text);
-        });
+        textRow.connect('changed', (e) => settings.set_string('custom-text', e.text));
         group.add(textRow);
+        page.add(group);
 
-        // Fixed Position Mode (New Switch)
-        const fixedModeRow = new Adw.SwitchRow({
-            title: _('Fixed Position Mode'),
-            subtitle: _('Keep text stationary when unlocking (does not fade out with clock)'),
+        // 行为控制组
+        const behaviorGroup = new Adw.PreferencesGroup({ title: _('Behavior') });
+        
+        const fixedRow = new Adw.SwitchRow({
+            title: _('Fixed Mode'),
+            subtitle: _('Stationary relative to screen (Fixes jumping issues)'),
             active: settings.get_boolean('fixed-mode')
         });
-        fixedModeRow.connect('notify::active', (sw) => {
-            settings.set_boolean('fixed-mode', sw.active);
-        });
-        group.add(fixedModeRow);
+        fixedRow.connect('notify::active', (s) => settings.set_boolean('fixed-mode', s.active));
+        behaviorGroup.add(fixedRow);
+        
+        page.add(behaviorGroup);
 
-        // Font Size
+        // 外观组
+        const appearanceGroup = new Adw.PreferencesGroup({ title: _('Appearance') });
+        
+        // 字体大小
         const sizeRow = new Adw.SpinRow({
             title: _('Font Size'),
-            adjustment: new Gtk.Adjustment({
-                lower: 8,
-                upper: 120,
-                step_increment: 1,
-                value: settings.get_int('font-size')
-            })
+            adjustment: new Gtk.Adjustment({ lower: 1, upper: 500, value: settings.get_int('font-size'), step_increment: 1 })
         });
-        sizeRow.connect('notify::value', (spin) => {
-            settings.set_int('font-size', spin.value);
-        });
-        group.add(sizeRow);
+        sizeRow.connect('notify::value', (s) => settings.set_int('font-size', s.value));
+        appearanceGroup.add(sizeRow);
 
-        // Position X
-        const posXRow = new Adw.SpinRow({
-            title: _('Offset X (Horizontal)'),
-            adjustment: new Gtk.Adjustment({
-                lower: -1000,
-                upper: 1000,
-                step_increment: 10,
-                value: settings.get_int('pos-x')
-            })
-        });
-        posXRow.connect('notify::value', (spin) => {
-            settings.set_int('pos-x', spin.value);
-        });
-        layoutGroup.add(posXRow);
-
-        // Position Y
-        const posYRow = new Adw.SpinRow({
-            title: _('Offset Y (Vertical)'),
-            adjustment: new Gtk.Adjustment({
-                lower: -1000,
-                upper: 1000,
-                step_increment: 10,
-                value: settings.get_int('pos-y')
-            })
-        });
-        posYRow.connect('notify::value', (spin) => {
-            settings.set_int('pos-y', spin.value);
-        });
-        layoutGroup.add(posYRow);
-
-        // Helper for Color Dialogs
-        const createColorRow = (title, key) => {
-            const row = new Adw.ActionRow({ title: title });
-            const colorButton = new Gtk.ColorDialogButton({
-                valign: Gtk.Align.CENTER,
-                dialog: new Gtk.ColorDialog()
-            });
-
-            // Set initial color
+        // 颜色选择器函数
+        const addColor = (title, key) => {
+            const row = new Adw.ActionRow({ title });
+            const btn = new Gtk.ColorDialogButton({ dialog: new Gtk.ColorDialog(), valign: Gtk.Align.CENTER });
             const rgba = new Gdk.RGBA();
             rgba.parse(settings.get_string(key));
-            colorButton.set_rgba(rgba);
-
-            colorButton.connect('notify::rgba', () => {
-                const c = colorButton.get_rgba();
-                const cssColor = `rgba(${Math.floor(c.red * 255)}, ${Math.floor(c.green * 255)}, ${Math.floor(c.blue * 255)}, ${c.alpha.toFixed(2)})`;
-                settings.set_string(key, cssColor);
+            btn.set_rgba(rgba);
+            btn.connect('notify::rgba', () => {
+                const c = btn.rgba;
+                settings.set_string(key, `rgba(${c.red*255},${c.green*255},${c.blue*255},${c.alpha})`);
             });
-
-            row.add_suffix(colorButton);
-            return row;
+            row.add_suffix(btn);
+            appearanceGroup.add(row);
         };
 
-        // Font Color
-        layoutGroup.add(createColorRow(_('Font Color'), 'font-color'));
+        addColor(_('Text Color'), 'font-color');
+        
+        // 阴影开关
+        const shadowRow = new Adw.SwitchRow({ title: _('Text Shadow'), active: settings.get_boolean('enable-shadow') });
+        shadowRow.connect('notify::active', (s) => settings.set_boolean('enable-shadow', s.active));
+        appearanceGroup.add(shadowRow);
+        
+        page.add(appearanceGroup);
 
-        // Shadow Switch
-        const shadowRow = new Adw.SwitchRow({
-            title: _('Enable Shadow'),
-            active: settings.get_boolean('enable-shadow')
-        });
-        shadowRow.connect('notify::active', (sw) => {
-            settings.set_boolean('enable-shadow', sw.active);
-        });
-        layoutGroup.add(shadowRow);
+        // 位置组
+        const posGroup = new Adw.PreferencesGroup({ title: _('Position Offset') });
+        const addPos = (title, key) => {
+            const row = new Adw.SpinRow({
+                title,
+                adjustment: new Gtk.Adjustment({ lower: -2000, upper: 2000, value: settings.get_int(key), step_increment: 5 })
+            });
+            row.connect('notify::value', (s) => settings.set_int(key, s.value));
+            posGroup.add(row);
+        };
+        addPos(_('Horizontal Offset (X)'), 'pos-x');
+        addPos(_('Vertical Offset (Y)'), 'pos-y');
+        page.add(posGroup);
 
-        // Shadow Color
-        layoutGroup.add(createColorRow(_('Shadow Color'), 'shadow-color'));
-
-        page.add(group);
-        page.add(layoutGroup);
         window.add(page);
     }
 }

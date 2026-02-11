@@ -2,9 +2,8 @@
 <schemalist gettext-domain="lock-screen-custom-text">
   <schema id="org.gnome.shell.extensions.lock-screen-custom-text" path="/org/gnome/shell/extensions/lock-screen-custom-text/">
     <key name="custom-text" type="s">
-      <default>"Hello, World!"</default>
+      <default>"Hello, GNOME!"</default>
       <summary>Custom Text</summary>
-      <description>The text to display on the lock screen.</description>
     </key>
     <key name="font-size" type="i">
       <default>24</default>
@@ -33,7 +32,6 @@
     <key name="fixed-mode" type="b">
       <default>false</default>
       <summary>Fixed Position Mode</summary>
-      <description>If true, text stays in place and does not move with the clock.</description>
     </key>
   </schema>
 </schemalist>
