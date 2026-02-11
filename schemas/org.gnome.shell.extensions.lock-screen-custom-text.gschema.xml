@@ -1,63 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="lock-screen-custom-text">
   <schema id="org.gnome.shell.extensions.lock-screen-custom-text" path="/org/gnome/shell/extensions/lock-screen-custom-text/">
-    
     <key name="custom-text" type="s">
-      <default>"Custom Lock Screen Text"</default>
-      <summary>Text Content</summary>
+      <default>"Hello, World!"</default>
+      <summary>Custom Text</summary>
+      <description>The text to display on the lock screen.</description>
     </key>
-
     <key name="font-size" type="i">
       <default>24</default>
-      <summary>Font Size (px)</summary>
+      <summary>Font Size</summary>
     </key>
-
     <key name="font-color" type="s">
-      <default>"rgba(255, 255, 255, 1)"</default>
-      <summary>Font Color (CSS rgba)</summary>
+      <default>"#ffffff"</default>
+      <summary>Font Color</summary>
     </key>
-
     <key name="enable-shadow" type="b">
       <default>true</default>
       <summary>Enable Shadow</summary>
     </key>
-
     <key name="shadow-color" type="s">
-      <default>"rgba(0, 0, 0, 0.5)"</default>
+      <default>"rgba(0,0,0,0.5)"</default>
       <summary>Shadow Color</summary>
     </key>
-
-    <key name="shadow-x" type="i">
-      <default>2</default>
-      <summary>Shadow X Offset</summary>
+    <key name="pos-x" type="i">
+      <default>0</default>
+      <summary>Position X Offset</summary>
     </key>
-
-    <key name="shadow-y" type="i">
-      <default>2</default>
-      <summary>Shadow Y Offset</summary>
+    <key name="pos-y" type="i">
+      <default>50</default>
+      <summary>Position Y Offset</summary>
     </key>
-
     <key name="fixed-mode" type="b">
       <default>false</default>
       <summary>Fixed Position Mode</summary>
-      <description>If true, text stays in place. If false, it moves with the clock.</description>
+      <description>If true, text stays in place and does not move with the clock.</description>
     </key>
-
-    <key name="position-preset" type="s">
-      <default>"top-center"</default>
-      <summary>Position Preset</summary>
-      <description>top-left, top-center, top-right, center, bottom-left, bottom-center, bottom-right</description>
-    </key>
-
-    <key name="pos-x" type="i">
-      <default>0</default>
-      <summary>Manual X Offset</summary>
-    </key>
-
-    <key name="pos-y" type="i">
-      <default>100</default>
-      <summary>Manual Y Offset</summary>
-    </key>
-
   </schema>
 </schemalist>

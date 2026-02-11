@@ -1,15 +1,9 @@
 {
-  "uuid": "lock-screen-custom-text@Chen07",
-  "name": "Lock Screen Custom Text",
-  "description": "Add customizable text to the lock screen with positioning and animation options.",
-  "shell-version": [
-    "45",
-    "46",
-    "47",
-    "48",
-    "49"
-  ],
-  "url": "",
-  "settings-schema": "org.gnome.shell.extensions.lock-screen-custom-text",
-  "version": 1
+    "name": "Lock Screen Custom Text",
+    "description": "Add customizable text to the lock screen with configurable position, font, and color.",
+    "uuid": "lock-screen-custom-text@Chen07",
+    "shell-version": [ "45", "46", "47", "48", "49" ],
+    "url": "",
+    "version": 2,
+    "settings-schema": "org.gnome.shell.extensions.lock-screen-custom-text"
 }
